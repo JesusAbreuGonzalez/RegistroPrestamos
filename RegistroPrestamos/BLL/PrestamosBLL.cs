@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace RegistroPrestamos.BLL
 {
-    public class PersonasBLL
+    public class PrestamosBLL
     {
         public static bool Existe(int id)
         {
@@ -18,7 +18,7 @@ namespace RegistroPrestamos.BLL
 
             try
             {
-                encontrado = contexto.Personas.Any(e => e.PersonaId == id);
+                encontrado = contexto.Prestamos.Any(e => e.PrestamoId == id);
             }
             catch (Exception)
             {
@@ -33,14 +33,14 @@ namespace RegistroPrestamos.BLL
             return encontrado;
         }
 
-        public static bool Insertar(Personas personas)
+        public static bool Insertar(Prestamos prestamos)
         {
             var contexto = new Contexto();
             bool insertado = false;
 
             try
             {
-                contexto.Personas.Add(personas);
+                contexto.Prestamos.Add(prestamos);
                 insertado = contexto.SaveChanges() > 0;
             }
             catch (Exception)
@@ -56,14 +56,14 @@ namespace RegistroPrestamos.BLL
             return insertado;
         }
 
-        public static bool Modificar(Personas personas)
+        public static bool Modificar(Prestamos prestamos)
         {
             var contexto = new Contexto();
             bool modificado = false;
 
             try
             {
-                contexto.Entry(personas).State = EntityState.Modified;
+                contexto.Entry(prestamos).State = EntityState.Modified;
                 modificado = contexto.SaveChanges() > 0;
             }
             catch (Exception)
@@ -79,12 +79,12 @@ namespace RegistroPrestamos.BLL
             return modificado;
         }
 
-        public static bool Guardar(Personas personas)
+        public static bool Guardar(Prestamos prestamos)
         {
-            if (!Existe(personas.PersonaId))
-                return Insertar(personas);
+            if (!Existe(prestamos.PrestamoId))
+                return Insertar(prestamos);
             else
-                return Modificar(personas);
+                return Modificar(prestamos);
         }
 
         public static bool Eliminar(int id)
@@ -94,11 +94,11 @@ namespace RegistroPrestamos.BLL
 
             try
             {
-                var personas = contexto.Personas.Find(id);
+                var prestamos = contexto.Prestamos.Find(id);
 
-                if (personas != null)
+                if (prestamos != null)
                 {
-                    contexto.Personas.Remove(personas);
+                    contexto.Prestamos.Remove(prestamos);
                     eliminado = contexto.SaveChanges() > 0;
                 }
             }
@@ -111,14 +111,14 @@ namespace RegistroPrestamos.BLL
             return eliminado;
         }
 
-        public static Personas Buscar(int id)
+        public static Prestamos Buscar(int id)
         {
             var contexto = new Contexto();
-            Personas personas;
+            Prestamos prestamos;
 
             try
             {
-                personas = contexto.Personas.Find(id);
+                prestamos = contexto.Prestamos.Find(id);
             }
             catch (Exception)
             {
@@ -130,17 +130,17 @@ namespace RegistroPrestamos.BLL
                 contexto.Dispose();
             }
 
-            return personas;
+            return prestamos;
         }
 
-        public static List<Personas> GetList(Expression<Func<Personas, bool>> criterio)
+        public static List<Prestamos> GetList(Expression<Func<Prestamos, bool>> criterio)
         {
-            List<Personas> lista = new List<Personas>();
+            List<Prestamos> lista = new List<Prestamos>();
             var contexto = new Contexto();
 
             try
             {
-                lista = contexto.Personas.Where(criterio).ToList();
+                lista = contexto.Prestamos.Where(criterio).ToList();
             }
             catch (Exception)
             {
@@ -155,14 +155,14 @@ namespace RegistroPrestamos.BLL
             return lista;
         }
 
-        public static List<Personas> GetPersonas()
+        public static List<Prestamos> GetPrestamos()
         {
-            List<Personas> lista = new List<Personas>();
+            List<Prestamos> lista = new List<Prestamos>();
             Contexto contexto = new Contexto();
 
             try
             {
-                lista = contexto.Personas.ToList();
+                lista = contexto.Prestamos.ToList();
             }
             catch (Exception)
             {
@@ -176,7 +176,5 @@ namespace RegistroPrestamos.BLL
 
             return lista;
         }
-
     }
 }
-
