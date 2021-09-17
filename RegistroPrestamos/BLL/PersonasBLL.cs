@@ -111,18 +111,17 @@ namespace RegistroPrestamos.BLL
             return eliminado;
         }
 
-        public static Personas Buscar(int id)
+        public static Personas Buscar(int PersonaId)
         {
-            var contexto = new Contexto();
-            Personas personas;
+            Contexto contexto = new Contexto();
+            Personas persona;
 
             try
             {
-                personas = contexto.Personas.Find(id);
+                persona = contexto.Personas.Where(p => p.PersonaId == PersonaId).FirstOrDefault();
             }
             catch (Exception)
             {
-
                 throw;
             }
             finally
@@ -130,21 +129,20 @@ namespace RegistroPrestamos.BLL
                 contexto.Dispose();
             }
 
-            return personas;
+            return persona;
         }
 
         public static List<Personas> GetList(Expression<Func<Personas, bool>> criterio)
         {
-            List<Personas> lista = new List<Personas>();
-            var contexto = new Contexto();
+            List<Personas> personaslist = new List<Personas>();
+            Contexto contexto = new Contexto();
 
             try
             {
-                lista = contexto.Personas.Where(criterio).ToList();
+                personaslist = contexto.Personas.Where(criterio).AsNoTracking().ToList();
             }
             catch (Exception)
             {
-
                 throw;
             }
             finally
@@ -152,7 +150,7 @@ namespace RegistroPrestamos.BLL
                 contexto.Dispose();
             }
 
-            return lista;
+            return personaslist;
         }
 
         public static List<Personas> GetPersonas()

@@ -1,26 +1,26 @@
-﻿@page "/RPrestamos"
+﻿@page "/RPersonas"
 
 @using RegistroPrestamos.Models
 @using RegistroPrestamos.BLL
 
 @inject IToastService toast
 
-<EditForm Model="Prestamo" OnValidSubmit="Guardar">
+<EditForm Model="Persona" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
     <div class="card" style="align-self:self-start">
         <div class="card-header">
-            <h3>Registro de Prestamos</h3>
+            <h3>Registro de Personas</h3>
         </div>
         <div class="card-body" style="align-self:self-start">
             <form>
-                @*PrestamoId*@
+                @*PersonaId*@
                 <div class="form-row align-items-lg-start">
                     <div class="col">
                         <div class="form-inline">
-                            <label><strong>Prestamo Id</strong></label>
+                            <label><strong>Persona Id</strong></label>
                             <div class="input-group">
                                 <hr />
-                                <InputNumber @bind-Value="Prestamo.PrestamoId" class=" form-control col-5" />
+                                <InputNumber @bind-Value="Persona.PersonaId" class=" form-control col-5" />
                                 <div class="input-group-append">
                                     <button type="button" class="btn btn-toolbar input-group-text" @onclick="Buscar"><span class="oi oi-magnifying-glass"></span>Buscar</button>
                                 </div>
@@ -30,49 +30,73 @@
                 </div>
                 <hr />
 
-                @*PersonaId*@
+                @*Nombre*@
                 <div class="form-row align-items-lg-start">
                     <div class="col">
                         <div class="form-inline">
-                            <label><strong>Persona Id</strong></label>
+                            <label><strong>Nombre</strong></label>
+                            <hr />
                             <div class="input-group">
-                                <InputSelect class="form-control w-100 pl-1" @bind-Value="Prestamo.PersonaId">
-
-                                    <option value="0">Selecciona una persona</option>
-
-                                    @foreach (var persona in PersonasBLL.GetList(per => true))
-                                    {
-                                        <option value="@persona.PersonaId">@persona.Cedula >>> @persona.Nombre</option>
-                                    }
-                                </InputSelect>
+                                <InputText @bind-Value="Persona.Nombre" class="form-control" />
                             </div>
                         </div>
                     </div>
                 </div>
                 <hr />
 
-                @*Concepto*@
+                @*Telefono*@
                 <div class="form-row align-items-lg-start">
                     <div class="col">
                         <div class="form-inline">
-                            <label><strong>Concepto</strong></label>
+                            <label><strong>Telefono</strong></label>
                             <hr />
                             <div class="input-group">
-                                <InputText @bind-Value="Prestamo.Concepto" class="form-control" />
+                                <InputText @bind-Value="Persona.Telefono" class="form-control" />
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <hr />
 
-                @*Monto*@
+                @*Cedula*@
                 <div class="form-row align-items-lg-start">
                     <div class="col">
                         <div class="form-inline">
-                            <label><strong>Monto</strong></label>
+                            <label><strong>Cédula</strong></label>
                             <hr />
                             <div class="input-group">
-                                <InputNumber @bind-Value="Prestamo.Monto" class="form-control" />
+                                <InputText required minlength="11" maxlength="11" @bind-Value="Persona.Cedula" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                @*Direccion*@
+                <div class="form-row align-items-lg-start">
+                    <div class="col">
+                        <div class="form-inline">
+                            <label><strong>Dirección</strong></label>
+                            <hr />
+                            <div class="input-group">
+                                <InputText @bind-Value="Persona.Direccion" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                @*FechaNacimiento*@
+                <div class="form-row align-items-lg-start">
+                    <div class="col">
+                        <div class="form-inline">
+                            <label><strong>Fecha Nacimiento</strong></label>
+                            <hr />
+                            <div class="input-group">
+                                <InputDate @bind-Value="Persona.FechaNacimiento" class="form-control" />
                             </div>
                         </div>
                     </div>
@@ -87,22 +111,7 @@
                             <label><strong>Balance</strong></label>
                             <hr />
                             <div class="input-group">
-                                <InputNumber readonly @bind-Value="Prestamo.Balance" class="form-control" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <hr />
-
-                @*Fecha Creacion*@
-                <div class="form-row align-items-lg-start">
-                    <div class="col">
-                        <div class="form-inline">
-                            <label><strong>Fecha Creación</strong></label>
-                            <hr />
-                            <div class="input-group">
-                                <InputDate @bind-Value="Prestamo.FechaCreacion" class="form-control" />
+                                <InputNumber readonly @bind-Value="Balance" class="form-control" />
                             </div>
                         </div>
                     </div>
@@ -127,66 +136,86 @@
 </EditForm>
 
 @code {
-
     [Parameter]
-    public int PrestamoId { get; set; }
+    public int PersonaId { get; set; }
 
-    private Prestamos Prestamo = new Prestamos();
+    private Personas Persona { get; set; }
+
+    public double Balance { get; set; }
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
         Nuevo();
-        Buscar(); //Sólo funciona si se pasa un id por parametro
+        Buscar();
     }
 
     public void Nuevo()
     {
-        Prestamo = new Prestamos();
+        Persona = new Personas();
+        Balance = 0;
+        PersonaId = 0;
     }
 
-    private void Buscar()
+    public void Buscar()
     {
-        if (Prestamo.PrestamoId > 0)
+        if (Persona.PersonaId > 0)
         {
-            var encontrado = PrestamosBLL.Buscar(Prestamo.PrestamoId);
-            Nuevo();
+            var encontrado = PersonasBLL.Buscar(Persona.PersonaId);
+            var prestamos = PrestamosBLL.GetList(pres => pres.PersonaId == Persona.PersonaId);
             if (encontrado != null)
-                this.Prestamo = encontrado;
+            {
+                this.Persona = encontrado;
+                if (prestamos.Count > 0)
+                {
+                    foreach (Prestamos prestamo in prestamos)
+                    {
+                        this.Balance += prestamo.Balance;
+                    }
+                }
+                else
+                {
+                    this.Balance = 0;
+                }
+            }
             else
-                toast.ShowWarning("No se ha encontrado el id: " + Prestamo.PrestamoId);
-
+            {
+                toast.ShowWarning("No Encontrado");
+            }
         }
     }
 
     public void Guardar()
     {
-        var guardado = PrestamosBLL.Guardar(Prestamo);
+        bool guardo;
 
-        if (guardado)
+        guardo = PersonasBLL.Guardar(Persona);
+
+        if (guardo)
         {
             Nuevo();
-            toast.ShowSuccess("Se ha guardado correctamente");
+            toast.ShowSuccess("Guardado correctamente");
         }
         else
         {
-            toast.ShowError("No ha sido posible guardar");
+            toast.ShowError("No se pudo guardar.");
         }
-
     }
 
     public void Eliminar()
     {
-        bool eliminado;
+        bool elimino;
 
-        eliminado = PrestamosBLL.Eliminar(Prestamo.PrestamoId);
+        elimino = PersonasBLL.Eliminar(Persona.PersonaId);
 
-        if (eliminado)
+        if (elimino)
         {
             Nuevo();
-            toast.ShowSuccess("Eliminado corectamente");
+            toast.ShowSuccess("Eliminado correctamente");
         }
         else
-            toast.ShowError("No fue posible eliminar");
-
+        {
+            toast.ShowError("No se pudo eliminar.");
+        }
     }
 }

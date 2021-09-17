@@ -10,7 +10,6 @@ namespace RegistroPrestamos.Models
     {
         [Key]
         public int PersonaId { get; set; }
-        public int PrestamosId { get; set; }
 
         [Required(ErrorMessage = "Es obligatorio introducir el nombre")]
         public string Nombre { get; set; }
@@ -30,12 +29,14 @@ namespace RegistroPrestamos.Models
         public Personas()
         {
             PersonaId = 0;
-            PrestamosId = 0;
             Nombre = string.Empty;
             Telefono = string.Empty;
             Cedula = string.Empty;
             Direccion = string.Empty;
             FechaNacimiento = DateTime.Now;
+            Prestamos = new HashSet<Prestamos>();
         }
+
+        public virtual ICollection<Prestamos> Prestamos { get; set; }
     }
 }

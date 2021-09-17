@@ -11,6 +11,7 @@ namespace RegistroPrestamos.Models
     {
         [Key]
         public int PrestamoId { get; set; }
+        public int PersonaId { get; set; }
 
         [Required(ErrorMessage = "Es obligatorio introducir el concepto")]
         public string Concepto { get; set; }
@@ -29,11 +30,7 @@ namespace RegistroPrestamos.Models
             Monto = 0;
             Balance = 0;
             FechaCreacion = DateTime.Now;
-            PersonaId = new List<Personas>();
+            PersonaId = 0;
         }
-
-        [ForeignKey("PrestamosId")]
-        public virtual List<Personas> PersonaId { get; set; }
-
     }
 }

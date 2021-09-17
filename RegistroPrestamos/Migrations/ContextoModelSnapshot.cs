@@ -37,16 +37,11 @@ namespace RegistroPrestamos.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("PrestamosId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Telefono")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("PersonaId");
-
-                    b.HasIndex("PrestamosId");
 
                     b.ToTable("Personas");
                 });
@@ -70,23 +65,29 @@ namespace RegistroPrestamos.Migrations
                     b.Property<double>("Monto")
                         .HasColumnType("REAL");
 
+                    b.Property<int>("PersonaId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("PersonasPersonaId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("PrestamoId");
+
+                    b.HasIndex("PersonasPersonaId");
 
                     b.ToTable("Prestamos");
                 });
 
-            modelBuilder.Entity("RegistroPrestamos.Models.Personas", b =>
-                {
-                    b.HasOne("RegistroPrestamos.Models.Prestamos", null)
-                        .WithMany("PersonaId")
-                        .HasForeignKey("PrestamosId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("RegistroPrestamos.Models.Prestamos", b =>
                 {
-                    b.Navigation("PersonaId");
+                    b.HasOne("RegistroPrestamos.Models.Personas", null)
+                        .WithMany("Prestamos")
+                        .HasForeignKey("PersonasPersonaId");
+                });
+
+            modelBuilder.Entity("RegistroPrestamos.Models.Personas", b =>
+                {
+                    b.Navigation("Prestamos");
                 });
 #pragma warning restore 612, 618
         }

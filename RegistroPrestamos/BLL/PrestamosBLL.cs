@@ -81,6 +81,7 @@ namespace RegistroPrestamos.BLL
 
         public static bool Guardar(Prestamos prestamos)
         {
+            prestamos.Balance = prestamos.Monto;
             if (!Existe(prestamos.PrestamoId))
                 return Insertar(prestamos);
             else
