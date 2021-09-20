@@ -168,6 +168,7 @@
                 this.Persona = encontrado;
                 if (prestamos.Count > 0)
                 {
+                    Balance = 0;
                     foreach (Prestamos prestamo in prestamos)
                     {
                         this.Balance += prestamo.Balance;
