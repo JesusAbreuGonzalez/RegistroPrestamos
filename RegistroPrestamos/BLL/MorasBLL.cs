@@ -143,7 +143,7 @@ namespace RegistroPrestamos.BLL
 
             try
             {
-                mora = contexto.Moras.Include(det => det.MorasDetalle).Where(m => m.MoraId == MoraId).FirstOrDefault();
+                mora = contexto.Moras.Include(e => e.MorasDetalle).Where(m => m.MoraId == MoraId).FirstOrDefault();
             }
             catch (Exception)
             {
