@@ -13,14 +13,14 @@ namespace RegistroPrestamos.Models
         public DateTime Fecha { get; set; }
         public double Total { get; set; }
 
-        public virtual ICollection<MorasDetalle> morasDetalle { get; set; }
+        public virtual ICollection<MorasDetalle> MorasDetalle { get; set; }
 
         Moras()
         {
             MoraId = 0;
             Fecha = DateTime.Now;
             Total = 0;
-            morasDetalle = new HashSet<MorasDetalle>();
+            MorasDetalle = new HashSet<MorasDetalle>();
         }
     }
 }
