@@ -1,0 +1,244 @@
+﻿@page "/RMoras"
+@page "/Moras/{MoraId:int}"
+
+@using RegistroPrestamos.Models
+@using RegistroPrestamos.BLL
+
+@inject IToastService toast
+
+<EditForm Model="Mora" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="card p-0 bg-light col-4 col-sm-4 col-md-4 col-lg-4 col-xl-5">
+        <div class="card-header text-center">
+            <div class="card-header">
+                <h3>Registro de Moras</h3>
+            </div>
+            <div class="card-body d-flex flex-column flex-sm-column flex-md-row flex-xl-row flex-lg-row justify-content-around">
+                <form>
+                    @*MoraId*@
+                    <div class="form-row align-items-lg-start">
+                        <div class="col">
+                            <div class="form-inline">
+                                <label><strong>Mora Id</strong></label>
+                                <div class="input-group">
+                                    <hr />
+                                    <InputNumber @bind-Value="Mora.MoraId" class="form-control col-5" />
+                                    <div class="input-group">
+                                        <button type="button" class="btn btn-toolbar input-group-text" @onclick="Buscar"><span class="oi oi-magnifying-glass"></span>Buscar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+
+                    @*Fecha*@
+                    <div class="form-row align-items-lg-start">
+                        <div class="col">
+                            <div class="form-inline">
+                                <label><strong>Fecha Creación</strong></label>
+                                <hr />
+                                <div class="input-group">
+                                    <InputDate @bind-Value="Mora.Fecha" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+
+                    <fieldset class="m-0 mt-1 border-dark">
+                        <legend>Detalle Mora</legend>
+
+                        <div class="d-flex flex-row justify-content-between">
+
+                            <div class="d-flex flex-column col-3">
+                                Prestamo:
+                                <select class="input-group p-1" bind-value="@MoraDetalle.PrestamoId" @onchange="@OnPrestamoChanged">
+                                    <option value="0">Seleccione un filtro</option>
+                                    @foreach (Prestamos prestamo in PrestamosBLL.GetList(p => true))
+                                    {
+                                        <option value=@(prestamo.PrestamoId)>@(prestamo.PrestamoId)</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="d-flex flex-column">
+                                Monto Pendiente:
+                                <input class="input-group" readonly type="text" @bind-value="@MontoPendiente" />
+                            </div>
+
+                            @*Total*@
+                            <div class="d-flex flex-column">
+                                Monto Mora:
+                                <input class="input-group" type="text" @bind-value="@MontoMora" />
+                            </div>
+
+                            <div class="d-flex flex-row justify-content-end align-items-end">
+                                <button type="button" class="btn btn-toolbar input-group-text" @onclick="Agregar"><span class="oi oi-plus"></span>Agregar</button>
+                            </div>
+                        </div>
+
+                        <div class="col mt-2">
+                            <table class="table table-bordered border-dark">
+                                <tr>
+                                    <th>No. Prestamo</th>
+                                    <th>Cliente</th>
+                                    <th>Monto</th>
+                                    <th>        </th>
+                                </tr>
+
+                                @foreach (MorasDetalle detalle in Mora.MorasDetalle)
+                                {
+                                    <tr>
+                                        <td>@detalle.PrestamoId</td>
+                                        <td>@(PersonasBLL.Buscar(PrestamosBLL.Buscar(detalle.PrestamoId).PersonaId).Nombre)</td>
+                                        <td>@detalle.Valor</td>
+                                        <td>
+                                            <button class="btn btn-danger" type="button" @onclick="() => Remover(detalle)">
+                                                <i class="oi oi-trash mr-2" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </table>
+                        </div>
+                    </fieldset>
+                    <hr />
+
+
+                    <br />
+                    <br />
+                    @*Botones*@
+                    <div class="card-footer d-flex flex-column flex-sm-column flex-md-row flex-xl-row flex-lg-row justify-content-around">
+                        <div class="form-inline" display: inline-blocks>
+                            <button type="button" class="btn btn-outline-dark" @onclick="Nuevo"><span class="oi oi-file"></span>Nuevo</button>
+                            &nbsp;&nbsp;
+                            <button type="button" class="btn btn-outline-dark" @onclick="Guardar"><span class="oi oi-hard-drive"></span>Guardar</button>
+                            &nbsp;&nbsp;
+                            <button type="button" class="btn btn-outline-dark" @onclick="Eliminar"><span class="oi oi-delete"></span>Eliminar</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int MoraId { get; set; }
+
+    public Moras Mora { get; set; }
+
+    public MorasDetalle MoraDetalle { get; set; }
+
+    public double MontoPendiente { get; set; }
+
+    public double MontoMora { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Nuevo();
+        Buscar();
+    }
+
+    public void OnPrestamoChanged(ChangeEventArgs e)
+    {
+        if (Convert.ToInt32(e.Value) != 0)
+        {
+            MoraDetalle.PrestamoId = Convert.ToInt32(e.Value);
+
+            MontoPendiente = PrestamosBLL.Buscar(MoraDetalle.PrestamoId).Balance;
+        }
+    }
+
+    public void Nuevo()
+    {
+        Mora = new Moras();
+        MoraDetalle = new MorasDetalle();
+        MontoPendiente = 0;
+        MontoMora = 0;
+        MoraId = 0;
+    }
+
+    public void Buscar()
+    {
+        if (Mora.MoraId > 0)
+        {
+            var encontrado = MorasBLL.Buscar(Mora.MoraId);
+            if (encontrado != null)
+            {
+                this.Mora = encontrado;
+                var count = Mora.MorasDetalle.Count;
+                Console.Write(count);
+            }
+            else
+            {
+                toast.ShowWarning("No Encontrado");
+            }
+        }
+    }
+
+    public void Agregar()
+    {
+        var balance = PrestamosBLL.Buscar(MoraDetalle.PrestamoId).Balance;
+
+        MoraDetalle.Valor = MontoMora > (balance * 0.25) ? balance * 0.25 : MontoMora;
+
+        Mora.MorasDetalle.Add(MoraDetalle);
+        MoraDetalle = new MorasDetalle();
+        MontoMora = 0;
+        Mora.Total = 0;
+        foreach (MorasDetalle detalle in Mora.MorasDetalle)
+        {
+            Mora.Total += detalle.Valor;
+        }
+    }
+
+    public void Remover(MorasDetalle Detalle)
+    {
+        Mora.MorasDetalle.Remove(Detalle);
+        Mora.Total = 0;
+        foreach (MorasDetalle detalle in Mora.MorasDetalle)
+        {
+            Mora.Total += detalle.Valor;
+        }
+    }
+
+    public void Guardar()
+    {
+        bool guardo;
+
+        guardo = MorasBLL.Guardar(Mora);
+
+        if (guardo)
+        {
+            Nuevo();
+            toast.ShowSuccess("Guardado correctamente");
+        }
+        else
+        {
+            toast.ShowError("No se pudo guardar.");
+        }
+    }
+
+    public void Eliminar()
+    {
+        bool elimino;
+
+        elimino = MorasBLL.Eliminar(Mora.MoraId);
+
+        if (elimino)
+        {
+            Nuevo();
+            toast.ShowSuccess("Eliminado correctamente");
+        }
+        else
+        {
+            toast.ShowError("No se pudo eliminar.");
+        }
+    }
+
+}
