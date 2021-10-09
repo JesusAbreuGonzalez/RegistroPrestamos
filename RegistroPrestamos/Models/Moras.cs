@@ -15,7 +15,7 @@ namespace RegistroPrestamos.Models
 
         public virtual ICollection<MorasDetalle> MorasDetalle { get; set; }
 
-        Moras()
+        public Moras()
         {
             MoraId = 0;
             Fecha = DateTime.Now;
