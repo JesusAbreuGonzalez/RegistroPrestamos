@@ -23,14 +23,14 @@ namespace RegistroPrestamos.BLL
             }
         }
 
-        public static bool Existe(int MoraId)
+        public static bool Existe(int Id)
         {
             Contexto contexto = new Contexto();
             bool encontrado = false;
 
             try
             {
-                encontrado = contexto.Moras.Any(p => p.MoraId == MoraId);
+                encontrado = contexto.Moras.Any(e => e.MoraId == Id);
             }
             catch (Exception)
             {
@@ -43,6 +43,7 @@ namespace RegistroPrestamos.BLL
 
             return encontrado;
         }
+
         public static bool Insertar(Moras mora)
         {
             Contexto contexto = new Contexto();
@@ -77,7 +78,7 @@ namespace RegistroPrestamos.BLL
             try
             {
                 AjustarPrestamos(mora, 0);
-                contexto.Database.ExecuteSqlRaw($"Delete from MoraDetalles where MoraId = {mora.MoraId}");
+                contexto.Database.ExecuteSqlRaw($"Delete from MorasDetalle where MoraId = {mora.MoraId}");
 
                 foreach (var anterior in mora.MorasDetalle)
                 {
@@ -109,7 +110,7 @@ namespace RegistroPrestamos.BLL
             Contexto contexto = new Contexto();
             try
             {
-                var mora = contexto.Moras.Include(det => det.MorasDetalle).Where(m => m.MoraId == MoraId).FirstOrDefault();
+                var mora = contexto.Moras.Include(e => e.MorasDetalle).Where(m => m.MoraId == MoraId).FirstOrDefault();
 
                 if (mora != null)
                 {
@@ -118,7 +119,7 @@ namespace RegistroPrestamos.BLL
                     paso = contexto.SaveChanges() > 0;
                     if (paso)
                     {
-                        contexto.Database.ExecuteSqlRaw($"Delete from MoraDetalles where MoraId = {MoraId}");
+                        contexto.Database.ExecuteSqlRaw($"Delete from MorasDetalle where MoraId = {MoraId}");
                     }
                 }
 
@@ -186,8 +187,10 @@ namespace RegistroPrestamos.BLL
                     foreach (MorasDetalle detalle in Mora.MorasDetalle)
                     {
                         var Prestamo = contexto.Prestamos.Where(p => p.PrestamoId == detalle.PrestamoId).FirstOrDefault();
-                        Prestamo.Balance += (option == 0 ? (detalle.Valor * -1) : detalle.Valor); // 0 => Revertir la mora; 1 => Aplicar la mora
+
+                        Prestamo.Balance += (option == 0 ? (detalle.Valor * -1) : detalle.Valor); // 0 -> Revertir la mora; 1 -> Aplicar la mora
                         contexto.Entry(Prestamo).State = EntityState.Modified;
+
                         contexto.SaveChanges();
                     }
                 }
